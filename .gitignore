@@ -1,0 +1,220 @@
+# ============================================
+# ROS2 Workspace - Generated Build Artifacts
+# ============================================
+
+# ROS2 Build Directories (inside each package)
+**/build/
+**/install/
+**/log/
+src/libfranka
+src/moveit_task_constructor
+src/franka_description
+
+
+# ============================================
+# Python
+# ============================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# ============================================
+# C/C++ Compiled Files
+# ============================================
+
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Debug files
+*.dSYM/
+*.su
+
+# ============================================
+# IDEs and Editors
+# ============================================
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Eclipse
+.cproject
+.project
+.pydevproject
+.settings/
+
+# Vim
+*.swp
+*.swo
+*~
+.*.swp
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# ============================================
+# Operating Systems
+# ============================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+.directory
+.Trash-*
+
+# ============================================
+# ROS2 Specific
+# ============================================
+
+# ROS logs and bag files
+*.log
+*.bag
+
+# RViz config (sometimes auto-generated)
+*.rviz.autosave
+
+# Process IDs
+*.pid
+
+# ============================================
+# Docker
+# ============================================
+
+# Don't ignore Dockerfiles, but ignore some temp files
+.docker/
+
+# ============================================
+# Backups and Temporary Files
+# ============================================
+
+*.bak
+*.backup
+*.tmp
+*.temp
+*~
+
+# ============================================
+# Machine Learning / Hugging Face Cache
+# ============================================
+
+# Model checkpoints and cache (can be huge!)
+*.ckpt
+*.pth
+*.pt
+models/checkpoints/
+.cache/
+
+# Hugging Face cache (if you don't want to track downloaded models)
+# Uncomment if needed:
+# **/.cache/huggingface/
+
+# ============================================
+# Other
+# ============================================
+
+# Core dumps
+core
+core.*
+
+# Tags
+tags
+TAGS

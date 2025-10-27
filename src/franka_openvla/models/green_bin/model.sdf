@@ -1,0 +1,122 @@
+<?xml version="1.0" ?>
+<sdf version="1.7">
+  <model name="green_bin">
+    <static>true</static>
+    <link name="bin_link">
+      <!-- Bottom - Thick and visible -->
+      <collision name="bottom_collision">
+        <pose>0 0 0.015 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.15 0.15 0.03</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="bottom_visual">
+        <pose>0 0 0.015 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.15 0.15 0.03</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.0 1.0 0.0 1</ambient>
+          <diffuse>0.0 1.0 0.0 1</diffuse>
+          <specular>0.2 0.2 0.2 1</specular>
+        </material>
+      </visual>
+
+      <!-- Front Wall -->
+      <collision name="front_wall_collision">
+        <pose>0.07 0 0.065 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.01 0.15 0.10</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="front_wall_visual">
+        <pose>0.07 0 0.065 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.01 0.15 0.10</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.0 1.0 0.0 1</ambient>
+          <diffuse>0.0 1.0 0.0 1</diffuse>
+          <specular>0.2 0.2 0.2 1</specular>
+        </material>
+      </visual>
+
+      <!-- Back Wall -->
+      <collision name="back_wall_collision">
+        <pose>-0.07 0 0.065 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.01 0.15 0.10</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="back_wall_visual">
+        <pose>-0.07 0 0.065 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.01 0.15 0.10</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.0 1.0 0.0 1</ambient>
+          <diffuse>0.0 1.0 0.0 1</diffuse>
+          <specular>0.2 0.2 0.2 1</specular>
+        </material>
+      </visual>
+
+      <!-- Left Wall -->
+      <collision name="left_wall_collision">
+        <pose>0 0.07 0.065 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.13 0.01 0.10</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="left_wall_visual">
+        <pose>0 0.07 0.065 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.13 0.01 0.10</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.0 1.0 0.0 1</ambient>
+          <diffuse>0.0 1.0 0.0 1</diffuse>
+          <specular>0.2 0.2 0.2 1</specular>
+        </material>
+      </visual>
+
+      <!-- Right Wall -->
+      <collision name="right_wall_collision">
+        <pose>0 -0.07 0.065 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.13 0.01 0.10</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="right_wall_visual">
+        <pose>0 -0.07 0.065 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.13 0.01 0.10</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.0 1.0 0.0 1</ambient>
+          <diffuse>0.0 1.0 0.0 1</diffuse>
+          <specular>0.2 0.2 0.2 1</specular>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

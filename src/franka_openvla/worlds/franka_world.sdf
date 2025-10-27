@@ -1,0 +1,124 @@
+<?xml version="1.0" ?>
+<sdf version="1.7">
+  <world name="pick_place_world_with_bins">
+    <!-- Physics settings -->
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <!-- Plugin for physics -->
+    <plugin filename="ignition-gazebo-physics-system" name="ignition::gazebo::systems::Physics">
+    </plugin>
+
+    <!-- Plugin for user commands -->
+    <plugin filename="ignition-gazebo-user-commands-system" name="ignition::gazebo::systems::UserCommands">
+    </plugin>
+
+    <!-- Plugin for scene broadcasting -->
+    <plugin filename="ignition-gazebo-scene-broadcaster-system" name="ignition::gazebo::systems::SceneBroadcaster">
+    </plugin>
+
+    <!-- Plugin for sensors (required for cameras and other sensors) -->
+    <plugin filename="ignition-gazebo-sensors-system" name="ignition::gazebo::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+    <!-- Lighting -->
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <!-- Ground plane -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.8 0.8 0.8 1</ambient>
+            <diffuse>0.8 0.8 0.8 1</diffuse>
+            <specular>0.8 0.8 0.8 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Work Table - Raised to proper height -->
+    <include>
+      <uri>model://work_table</uri>
+      <name>work_table</name>
+      <pose>0.6 0.0 0.025 0 0 0</pose>
+    </include>
+
+    <!-- Green Bin - Left side front -->
+    <include>
+      <uri>model://green_bin</uri>
+      <name>green_bin</name>
+      <pose>0.45 0.45 0.0 0 0 0</pose>
+    </include>
+
+    <!-- Black Bin - Left side back -->
+    <include>
+      <uri>model://black_bin</uri>
+      <name>black_bin</name>
+      <pose>0.65 0.45 0.0 0 0 0</pose>
+    </include>
+
+    <!-- Red Bin - Right side front -->
+    <include>
+      <uri>model://red_bin</uri>
+      <name>red_bin</name>
+      <pose>0.45 -0.45 0.0 0 0 0</pose>
+    </include>
+
+    <!-- Blue Bin - Right side back -->
+    <include>
+      <uri>model://blue_bin</uri>
+      <name>blue_bin</name>
+      <pose>0.65 -0.45 0.0 0 0 0</pose>
+    </include>
+
+    <!-- Target cube - On table -->
+    <include>
+      <uri>model://cube</uri>
+      <name>target_cube</name>
+      <pose>0.6 0.0 0.065 0 0 0</pose>
+    </include>
+
+    <!-- RGB-D Camera - Positioned to match LIBERO agentview camera -->
+    <include>
+      <uri>model://rgbd_camera</uri>
+      <name>workspace_camera</name>
+      <!-- LIBERO agentview: camera across from robot, looking back at it
+           Position: beyond table, centered, lower height to see workspace
+           Robot at top of frame, workspace at middle-bottom
+           Pose format: x y z roll pitch yaw (radians) -->
+      <pose>1.2 0.0 1.0 0 0.7 3.14159</pose>
+    </include>
+
+  </world>
+</sdf>
