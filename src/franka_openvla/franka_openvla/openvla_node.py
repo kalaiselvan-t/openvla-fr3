@@ -194,6 +194,8 @@ class VLA(Node):
         if isinstance(action, torch.Tensor):
             action = action.cpu().numpy()
 
+        self.get_logger().info(f"Predicted action: {action}")
+
         return action
 
     def publish_action(self, action):
@@ -214,10 +216,10 @@ class VLA(Node):
 
         self.action_pub.publish(msg)
 
-        self.get_logger().info(
-            f'Action: pos=[{action[0]:.4f}, {action[1]:.4f}, {action[2]:.4f}] '
-            f'gripper={action[6]:.3f}'
-        )
+        # self.get_logger().info(
+        #     f'Action: pos=[{action[0]:.4f}, {action[1]:.4f}, {action[2]:.4f}] '
+        #     f'gripper={action[6]:.3f}'
+        # )
 
     
     def destroy_node(self):
