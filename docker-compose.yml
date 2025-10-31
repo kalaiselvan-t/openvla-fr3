@@ -1,0 +1,33 @@
+services:
+  vla_unified:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - USER_UID=${USER_UID}
+        - USER_GID=${USER_GID}
+    container_name: vla_unified
+    network_mode: "host"
+    privileged: true
+    runtime: nvidia
+    command: /bin/bash
+    tty: true
+    stdin_open: true
+    volumes:
+      - ./:/ros2_ws
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./limits.conf:/etc/security/limits.conf
+      - /dev:/dev
+      - /home/kalai/.cache/huggingface:/home/user/.cache/huggingface
+    environment:
+      QT_X11_NO_MITSHM: 1
+      DISPLAY: $DISPLAY
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility,graphics
+      ROS_DOMAIN_ID: 0
+    cap_add:
+      - SYS_NICE
+    ulimits:
+      rtprio: 99
+      rttime: -1
+      memlock: 8428281856

@@ -293,94 +293,11 @@ def generate_launch_description():
         ],
     )
 
-    #=================================Pick and Place=====================================
-    # Pick and Place Node definition
-    pick_and_place_node = Node(
-        package='franka_pick_place',
-        executable='basic_pick_place_node',
-        name='pick_and_place_node',
-        output='screen',
-        parameters=[
-            robot_description,
-            robot_description_semantic,
-            kinematics_yaml,
-            {"use_sim_time": True},
-        ],
-        arguments=['--ros-args', '--log-level', 'WARN'],
-    )
-
-    # Event handler 2: Launch pick&place after MoveIt services are available
+    # Event handler: Launch pick&place after MoveIt services are available
     wait_for_moveit_service = ExecuteProcess(
         cmd=['bash', '-c', 'until ros2 service list | grep -q "plan_kinematic_path"; do echo "Waiting for MoveIt planning service..."; sleep 1; done; echo "MoveIt service available!"'],
         output='screen'
     )
-
-    pick_and_place_launch = RegisterEventHandler(
-        OnProcessExit(
-            target_action=wait_for_moveit_service,
-            on_exit=[pick_and_place_node]
-        )
-    )
-
-    cube_monitor_node = Node(
-        package='franka_pick_place',
-        executable='cube_location_monitor_node',
-        name='cube_location_monitor',
-        output='screen',
-        parameters=[
-            robot_description,
-            robot_description_semantic,
-            kinematics_yaml,
-            {"use_sim_time": True}
-        ],
-        arguments=['--ros-args', '--log-level', 'INFO'],  # Use INFO to see cube tracking messages
-    )
-
-    cube_monitor_launch = RegisterEventHandler(
-        OnProcessExit(
-            target_action=wait_for_moveit_service,
-            on_exit=[cube_monitor_node]
-        )
-    )
-
-    franka_pick_place_node = Node(
-        package='franka_pick_place',
-        executable='franka_pick_place_node',
-        name='franka_pick_place_node',
-        output='screen',
-        parameters=[
-            robot_description,
-            robot_description_semantic,
-            kinematics_yaml,
-            ompl_planning_pipeline_config_mtc,
-            PathJoinSubstitution([
-                FindPackageShare("franka_pick_place"),"config", "params.yaml"]
-            ),
-            {"use_sim_time": True}
-        ],
-        arguments=['--ros-args', '--log-level', 'INFO']
-    )
-
-    franka_pick_place_launch = RegisterEventHandler(
-        OnProcessExit(
-            target_action=wait_for_moveit_service,
-            on_exit=[franka_pick_place_node]
-        )
-    )
-
-    # For manual pick and place tasks
-    # static_tf_camera_node = Node(
-    #     package='tf2_ros',
-    #     executable='static_transform_publisher',
-    #     name='camera_to_world_tf',
-    #     arguments=[
-    #         '0.6', '0.0', '1.2',
-    #         '0', '1.5708', '0',
-    #         'world',
-    #         'workspace_camera/camera_link/rgbd_camera_sensor'
-    #     ],
-    #     parameters=[{"use_sim_time": True}],
-    # )
 
     # LIBERO agentview camera: across table from robot, looking back at it
     static_tf_camera_node = Node(
@@ -399,9 +316,6 @@ def generate_launch_description():
     #=================================Nodes to launch=====================================
 
     nodes_to_launch = [
-        # Set global log level to WARN for all nodes (above DEBUG and INFO)
-        SetEnvironmentVariable('RCUTILS_LOGGING_SEVERITY_THRESHOLD', 'WARN'),
-        # Set global use_sim_time parameter early - critical for MoveIt2 clock synchronization
         SetParameter(name='use_sim_time', value=True),
         robot_state_publisher_node,
         gazebo,
@@ -413,9 +327,6 @@ def generate_launch_description():
         rviz_node,
         moveit_launch,
         wait_for_moveit_service,
-        # pick_and_place_launch,
-        # cube_monitor_launch,
-        franka_pick_place_launch,
         static_tf_camera_node
     ]
 
