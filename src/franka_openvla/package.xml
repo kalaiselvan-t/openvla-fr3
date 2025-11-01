@@ -3,11 +3,15 @@
 <package format="3">
   <name>franka_openvla</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>OpenVLA integration for Franka FR3 robot control</description>
   <maintainer email="im.kalaiselvan.t@gmail.com">user</maintainer>
-  <license>TODO: License declaration</license>
+  <license>Apache-2.0</license>
 
   <depend>rclpy</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>vla_interfaces</depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

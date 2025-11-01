@@ -27,6 +27,7 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
         ('share/' + package_name + '/launch', glob('launch/*.py')),
+        ('share/' + package_name + '/config', glob('config/*.yaml')),
         ('share/' + package_name + '/worlds', glob('worlds/*.world') + glob('worlds/*.sdf')),
     ] + model_data_files,
     install_requires=['setuptools'],

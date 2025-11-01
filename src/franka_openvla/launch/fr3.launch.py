@@ -170,6 +170,11 @@ def generate_launch_description():
         'franka_fr3_moveit_config', 'config/kinematics.yaml'
     )
 
+    # Provide fallback if kinematics config can't be loaded
+    if kinematics_yaml is None:
+        print("Warning: Could not load kinematics config, using default")
+        kinematics_yaml = {}
+
     #=================================Moveit Planning=======================================
     # Planning Functionality
     ompl_planning_pipeline_config = {
@@ -204,13 +209,20 @@ def generate_launch_description():
         'franka_fr3_moveit_config', 'config/ompl_planning.yaml'
     )
 
-    ompl_planning_pipeline_config['move_group'].update(ompl_planning_yaml)
-    ompl_planning_pipeline_config_mtc['ompl'].update(ompl_planning_yaml)
+    if ompl_planning_yaml is not None:
+        ompl_planning_pipeline_config['move_group'].update(ompl_planning_yaml)
+        ompl_planning_pipeline_config_mtc['ompl'].update(ompl_planning_yaml)
+    else:
+        print("Warning: Could not load OMPL planning config, using defaults")
 
     # Trajectory Execution Functionality
     moveit_simple_controllers_yaml = load_yaml(
-    'franka_pick_place', 'config/moveit_controllers.yaml'
+    'franka_openvla', 'config/moveit_controllers.yaml'
     )
+
+    if moveit_simple_controllers_yaml is None:
+        print("Warning: Could not load MoveIt controllers config, using default")
+        moveit_simple_controllers_yaml = {}
 
     moveit_controllers = {
         'moveit_simple_controller_manager': moveit_simple_controllers_yaml,

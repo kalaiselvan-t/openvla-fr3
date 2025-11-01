@@ -1,4 +1,5 @@
 import sys
+import time
 import rclpy
 import torch
 import numpy as np
@@ -7,7 +8,8 @@ from functools import wraps
 from rclpy.node import Node
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import Vector3
+from vla_interfaces.msg import VLAAction
 from bitsandbytes.nn import Params4bit, Int8Params
 from transformers.modeling_utils import PreTrainedModel
 from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
@@ -21,7 +23,7 @@ class VLA(Node):
         # Declare parameters
         self.declare_parameter('model_name', 'openvla/openvla-7b-finetuned-libero-spatial')
         self.declare_parameter('camera_topic', '/rgbd_camera/image')
-        self.declare_parameter('action_topic', '/vla/predicted_action')
+        self.declare_parameter('action_topic', '/vla/delta_actions')
         self.declare_parameter('instruction', 'pick up the green cube')
 
         # Get parameters
@@ -29,6 +31,11 @@ class VLA(Node):
         self.camera_topic = self.get_parameter('camera_topic').value
         self.action_topic = self.get_parameter('action_topic').value
         self.instruction = self.get_parameter('instruction').value
+
+        # Timing tracking for inference speed measurement
+        self.last_inference_time = None
+        self.inference_times = []
+        self.inference_count = 0
 
         self.get_logger().info(f'OpenVLA Node starting...')
         self.get_logger().info(f'   Model: {self.model_name}')
@@ -61,14 +68,15 @@ class VLA(Node):
             qos_profile
         )
 
-        # Action publisher
+        # Action publisher - now using custom VLAAction message
         self.action_pub = self.create_publisher(
-            PoseStamped,
+            VLAAction,
             self.action_topic,
             10
         )
 
         self.get_logger().info('OpenVLA Node ready!')
+        self.get_logger().info('Publishing delta actions (not absolute poses)!')
 
     def load_model(self):
         """Load 4-bit quantized OpenVLA model with all necessary patches"""
@@ -154,15 +162,24 @@ class VLA(Node):
     def image_callback(self, msg):
         """Process incoming camera image and run VLA inference."""
         try:
+            # Start timing
+            callback_start = time.time()
+
             # Convert ROS Image to PIL Image
             cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='rgb8')
             pil_image = PILImage.fromarray(cv_image)
 
             # Run inference
+            inference_start = time.time()
             action = self.predict_action(pil_image, self.instruction)
+            inference_end = time.time()
 
             # Publish action
             self.publish_action(action)
+
+            # Calculate timing statistics
+            callback_end = time.time()
+            self.update_timing_stats(callback_start, callback_end, inference_end - inference_start)
 
         except Exception as e:
             self.get_logger().error(f'Error in image callback: {e}')
@@ -199,29 +216,65 @@ class VLA(Node):
         return action
 
     def publish_action(self, action):
-        """Publish predicted action as PoseStamped"""
+        """Publish predicted delta action using VLAAction message
 
-        msg = PoseStamped()
+        IMPORTANT: OpenVLA outputs DELTA actions (relative changes), not absolute poses!
+        Action format: [delta_x, delta_y, delta_z, delta_roll, delta_pitch, delta_yaw, gripper]
+        """
+        msg = VLAAction()
         msg.header.stamp = self.get_clock().now().to_msg()
         msg.header.frame_id = "fr3_link0"
 
-        # Action format: [x, y, z, roll, pitch, yaw, gripper]
-        msg.pose.position.x = float(action[0])
-        msg.pose.position.y = float(action[1])
-        msg.pose.position.z = float(action[2])
+        # Delta position (relative changes in meters)
+        msg.delta_pos = Vector3()
+        msg.delta_pos.x = float(action[0])
+        msg.delta_pos.y = float(action[1])
+        msg.delta_pos.z = float(action[2])
 
-        # Convert Euler to quaternion (simplified - just log for now)
-        # TODO: Proper Euler->Quaternion conversion
-        msg.pose.orientation.w = 1.0
+        # Delta rotation (relative changes in radians)
+        msg.delta_rot = Vector3()
+        msg.delta_rot.x = float(action[3])  # delta_roll
+        msg.delta_rot.y = float(action[4])  # delta_pitch
+        msg.delta_rot.z = float(action[5])  # delta_yaw
+
+        # Gripper (absolute: 0=open, 1=closed)
+        msg.gripper = float(action[6])
 
         self.action_pub.publish(msg)
 
-        # self.get_logger().info(
-        #     f'Action: pos=[{action[0]:.4f}, {action[1]:.4f}, {action[2]:.4f}] '
-        #     f'gripper={action[6]:.3f}'
-        # )
+    def update_timing_stats(self, callback_start, callback_end, inference_time):
+        """Update and log timing statistics for inference speed measurement"""
+        self.inference_count += 1
 
-    
+        # Calculate frequency
+        if self.last_inference_time is not None:
+            time_since_last = callback_start - self.last_inference_time
+            current_freq = 1.0 / time_since_last if time_since_last > 0 else 0
+            self.inference_times.append(time_since_last)
+
+            # Keep only last 50 measurements for rolling average
+            if len(self.inference_times) > 50:
+                self.inference_times.pop(0)
+
+            # Log every 10 inferences
+            if self.inference_count % 10 == 0:
+                avg_period = np.mean(self.inference_times)
+                avg_freq = 1.0 / avg_period if avg_period > 0 else 0
+                total_callback_time = callback_end - callback_start
+
+                self.get_logger().info(
+                    f'Inference Stats (last 50 samples):\n'
+                    f'  Average Frequency: {avg_freq:.2f} Hz\n'
+                    f'  Current Frequency: {current_freq:.2f} Hz\n'
+                    f'  Inference Time: {inference_time*1000:.1f} ms\n'
+                    f'  Total Callback Time: {total_callback_time*1000:.1f} ms\n'
+                    f'  Count: {self.inference_count}',
+                    throttle_duration_sec=5.0
+                )
+
+        self.last_inference_time = callback_start
+
+
     def destroy_node(self):
         """Override destroy_node to ensure proper cleanup."""
         self.cleanup_gpu()
