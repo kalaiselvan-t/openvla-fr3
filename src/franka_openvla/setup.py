@@ -45,6 +45,7 @@ setup(
         'console_scripts': [
             'openvla_node = franka_openvla.openvla_node:main',
             'keyboard_servo_teleop = franka_openvla.keyboard_servo_teleop:main',
+            'vla_servo_bridge = franka_openvla.vla_servo_bridge:main',
         ],
     },
 )

@@ -360,6 +360,40 @@ def generate_launch_description():
         )
     )
 
+    #=================================VLA Integration=====================================
+    # OpenVLA Node - publishes VLAAction messages with delta actions
+    openvla_node = Node(
+        package='franka_openvla',
+        executable='openvla_node',
+        name='openvla_node',
+        output='screen',
+        parameters=[
+            {'use_sim_time': True},
+        ],
+        arguments=['--ros-args', '--log-level', 'INFO'],
+    )
+
+    # VLA-Servo Bridge - converts VLA delta actions to servo twist commands
+    vla_servo_bridge_node = Node(
+        package='franka_openvla',
+        executable='vla_servo_bridge',
+        name='vla_servo_bridge',
+        output='screen',
+        parameters=[
+            {'use_sim_time': True},
+            {'vla_action_topic': '/vla/delta_actions'},
+            {'servo_command_topic': '/servo_node/delta_twist_cmds'},
+            {'command_frame': 'fr3_link0'},
+            {'linear_scale': 1.0},
+            {'angular_scale': 1.0},
+            {'max_linear_vel': 0.3},
+            {'max_angular_vel': 0.5},
+            {'command_timeout': 0.5},
+            {'auto_start_servo': True},
+        ],
+        arguments=['--ros-args', '--log-level', 'INFO'],
+    )
+
     nodes_to_launch = [
         SetParameter(name='use_sim_time', value=True),
         robot_state_publisher_node,
@@ -373,7 +407,9 @@ def generate_launch_description():
         moveit_launch,
         wait_for_moveit_service,
         servo_launch,  # Launch servo after MoveIt is ready
-        static_tf_camera_node
+        static_tf_camera_node,
+        openvla_node,  # OpenVLA vision-language-action model
+        vla_servo_bridge_node,  # Bridge between VLA and MoveIt Servo
     ]
 
     return LaunchDescription(declared_arguments + nodes_to_launch)
