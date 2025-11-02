@@ -22,12 +22,14 @@ class VLA(Node):
 
         # Declare parameters
         self.declare_parameter('model_name', 'openvla/openvla-7b-finetuned-libero-spatial')
+        self.declare_parameter('unnorm_key', 'libero_spatial')
         self.declare_parameter('camera_topic', '/rgbd_camera/image')
         self.declare_parameter('action_topic', '/vla/delta_actions')
-        self.declare_parameter('instruction', 'pick up the green cube')
+        self.declare_parameter('instruction', 'pick up the small green cube on the center of the table')
 
         # Get parameters
         self.model_name = self.get_parameter('model_name').value
+        self.unnorm_key = self.get_parameter('unnorm_key').value
         self.camera_topic = self.get_parameter('camera_topic').value
         self.action_topic = self.get_parameter('action_topic').value
         self.instruction = self.get_parameter('instruction').value
@@ -203,7 +205,7 @@ class VLA(Node):
         with torch.no_grad():
             action = self.model.predict_action(
                 **inputs,
-                unnorm_key="libero_spatial",
+                unnorm_key=self.unnorm_key,
                 do_sample=False
             )
 
