@@ -284,6 +284,31 @@ def generate_launch_description():
         )
     )
 
+    #=================================MoveIt Servo=====================================
+    # Load Servo configuration following official MoveIt Servo pattern
+    servo_yaml = load_yaml('franka_openvla', 'config/servo_params.yaml')
+
+    # Wrap in "moveit_servo" namespace as required by MoveIt Servo
+    servo_params = {"moveit_servo": servo_yaml}
+
+    print(f"[Servo Config] Loaded config with move_group_name: {servo_yaml.get('move_group_name', 'NOT_FOUND')}")
+
+    # MoveIt Servo node for real-time Cartesian control
+    # Following official servo_example.launch.py pattern
+    servo_node = Node(
+        package='moveit_servo',
+        executable='servo_node_main',
+        name='servo_node',
+        output='screen',
+        parameters=[
+            servo_params,  # Must be first! Contains move_group_name
+            robot_description,
+            robot_description_semantic,
+            kinematics_yaml,
+        ],
+        arguments=['--ros-args', '--log-level', 'INFO'],
+    )
+
     #=================================Rviz=====================================
     # RViz
     rviz_base = os.path.join(get_package_share_directory(
@@ -327,6 +352,14 @@ def generate_launch_description():
 
     #=================================Nodes to launch=====================================
 
+    # Event handler: Launch Servo after MoveIt services are available
+    servo_launch = RegisterEventHandler(
+        OnProcessExit(
+            target_action=wait_for_moveit_service,
+            on_exit=[servo_node],
+        )
+    )
+
     nodes_to_launch = [
         SetParameter(name='use_sim_time', value=True),
         robot_state_publisher_node,
@@ -339,6 +372,7 @@ def generate_launch_description():
         rviz_node,
         moveit_launch,
         wait_for_moveit_service,
+        servo_launch,  # Launch servo after MoveIt is ready
         static_tf_camera_node
     ]
 

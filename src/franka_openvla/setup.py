@@ -44,6 +44,7 @@ setup(
     entry_points={
         'console_scripts': [
             'openvla_node = franka_openvla.openvla_node:main',
+            'keyboard_servo_teleop = franka_openvla.keyboard_servo_teleop:main',
         ],
     },
 )
