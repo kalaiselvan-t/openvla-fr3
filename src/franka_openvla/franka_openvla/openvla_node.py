@@ -25,7 +25,7 @@ class VLA(Node):
         self.declare_parameter('unnorm_key', 'libero_spatial')
         self.declare_parameter('camera_topic', '/rgbd_camera/image')
         self.declare_parameter('action_topic', '/vla/delta_actions')
-        self.declare_parameter('instruction', 'move to the red bin')
+        self.declare_parameter('instruction', 'pick the cube on the table')
 
         # Get parameters
         self.model_name = self.get_parameter('model_name').value

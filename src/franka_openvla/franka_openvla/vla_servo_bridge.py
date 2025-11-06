@@ -21,7 +21,7 @@ class VLAServoRidge(Node):
         # Declare parameters
         self.declare_parameter('vla_action_topic', '/vla/delta_actions')
         self.declare_parameter('servo_command_topic', '/servo_node/delta_twist_cmds')
-        self.declare_parameter('command_frame', 'fr3_link0')
+        self.declare_parameter('command_frame', 'fr3_hand_tcp')
         self.declare_parameter('linear_scale', 1.0)  # Scale factor for linear velocities
         self.declare_parameter('angular_scale', 1.0)  # Scale factor for angular velocities
         self.declare_parameter('max_linear_vel', 0.3)  # Max linear velocity (m/s equivalent)
